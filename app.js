@@ -1,14 +1,22 @@
 import express from "express";
-import ConnectDB from "./db/connectDb";
-import { addUser } from "./db/userController";
-ConnectDB();
+import MongoManager from "./db/mongoManager";
+import UserController from "./db/userController";
 
-addUser('Sang dep trai', '123123')
+const startApp = () => {
+  console.log("aaa")
+  const app = express();
+  const port = process.env.PORT || 8000;
+  app.get("/hello", (req, res) => res.send("hello world from cules coding"));
+  app.listen(port, () => console.log(`Server is running on ${port}`));
+};
 
-const app = express();
+startApp();
 
-app.get("/hello", (req, res) => res.send("hello world from cules coding"));
 
-const port = process.env.PORT || 8000;
+const createUser = async (username, password) => {
+  let message = await UserController.createUser(username, password);
+  
+};
 
-app.listen(port, () => console.log(`Server is running on ${port}`));
+
+createUser('Sang', '123')
