@@ -1,6 +1,6 @@
 import express from "express";
 import MongoManager from "./db/mongoManager";
-import UserController from "./db/userController";
+import UserController from "./db/controller/userController";
 
 const startApp = () => {
   console.log("aaa")
