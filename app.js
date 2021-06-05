@@ -12,16 +12,16 @@ const startApp = () => {
   app.listen(port, () => console.log(`Server is running on ${port}`));
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
-  app.use("/api",router);
+  app.use("/user",router);
   
 };
 
 startApp();
 
-const createUser = async (username, password, email, firstName, lastName, dateOfBirth) => {
-  let message = await UserController.createUser(username, password, email, firstName, lastName, dateOfBirth);
-  
-};
-
-
-createUser('Sang', '123',"1","1","1",1)
+// const createUser = async (username, password, email, firstName, lastName, dateOfBirth) => {
+//   let message = await UserController.createUser(username, password, email, firstName, lastName, dateOfBirth);
+//
+// };
+//
+//
+// createUser('Sang', '123',"1","1","1",1)

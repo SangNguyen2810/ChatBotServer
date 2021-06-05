@@ -34,11 +34,13 @@ router.post("/register", async (req, res) => {
       email,
       firstName,
       lastName,
-      dateOfBirth
-    ).then ((result) => {
+      dateOfBirth)
+      .then ((result) => {
         res.json({result});
-      }
-    )
+      })
+      .catch((err)=>{
+        res.json({err})
+      })
   }
 });
 
