@@ -6,7 +6,6 @@ import config from "../config";
 
 const maxAge = 1 * 24 * 60 * 60; // maxAge of 1 day
 const createToken = (id) => {
-  console.log(config.secret);
   return jwt.sign({ id }, config.secret, {
       expiresIn: maxAge
   });
@@ -36,17 +35,18 @@ router.post("/register", async (req, res) => {
       firstName,
       lastName,
       dateOfBirth
-    );
+    ).then ((result) => {
+        res.json({result});
+      }
+    )
   }
 });
 
 router.post("/login", async (req, res) => {
   const {username, password} = req.body;
-  UserController.login_post(username, password)
+  UserController.loginPost(username, password)
     .then((user) => {
-      console.log("generating token");
       const token = createToken(user._id);
-      console.log("Done generating token");
       res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 7 });
       res.status(201).json({
        user: user._id,

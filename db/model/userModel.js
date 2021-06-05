@@ -1,32 +1,36 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose;
 import bcrypt from "bcrypt";
+import { isEmail } from 'validator';
 const saltRounds = 10;
 
 const UserSchema = new Schema({
   username: {
     type: String,
-    require: true,
+    required: [true, 'Please enter an username'],
+    unique: true
   },
   password: {
     type: String,
-    require: true,
+    required: [true, 'Please enter a password'],
+    minlength: [6, 'minimum password length is 6']
   },
   email: {
     type: String,
-    require: true,
+    required: [true, 'Please enter an email'],
+    validate: [isEmail, 'Please enter a validate email']
   },
   firstName: {
     type: String,
-    require: true,
+    required: true,
   },
   lastName: {
     type: String,
-    require: true,
+    required: true,
   },
   dateOfBirth: {
     type: Date,
-    require: true,
+    required: true,
   },
 
 });
@@ -42,20 +46,6 @@ UserSchema.pre('save', async function (next) {
   }
 });
 
-UserSchema.statics.login = async function (username, password) {
-  const user = await this.findOne({username: username}) 
-  if (user) {
-    const auth = await bcrypt.compare (password, user.password);
-    if (auth) {
-      console.log("found user");
-      return user;
-    }
-    else {
-      throw Error("Incorrect Password!");
-    }
-  }
-  else throw ("User not existed!");
-}
 
 const UserModel = mongoose.model("User", UserSchema, "User");
 

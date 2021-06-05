@@ -1,9 +1,21 @@
 import UserModel from "../model/userModel";
 import DbMessage from "../../static/dbMessage";
 import connect from '../mongoManager';
+import bcrypt from 'bcrypt';
 
 class UserController {
   constructor() {}
+
+  handleErrors(err) {
+    let errors = {};
+    if (err._message.includes('User validation failed')) {
+      Object.values(err.errors).forEach(({ properties }) => {
+          errors[properties.path] = properties.message;
+      });
+    }
+    return errors;
+  }
+
   async createUser(
     username,
     password,
@@ -28,43 +40,40 @@ class UserController {
         firstName,
         lastName,
         dateOfBirth
-      )
-        .then((res) => {
-          if (res.err === null) {
-            return DbMessage.CREATE_USER_SUCCESS;
-          }
+      ).then((res) => {
+          return {
+            message: DbMessage.CREATE_USER_SUCCESS,
+          };
         })
         .catch((err) => {
-          return err.err;
+          return errors;
         });
     }
   }
 
   createUserDB(username, password, email, firstName, lastName, dateOfBirth) {
     return new Promise ((resolve, reject) => {
-      let user = new UserModel({
+      UserModel.create({
         username,
         password,
         email,
         firstName,
         lastName,
         dateOfBirth
-      });
-      try {
-        user.save();
+      }).then ((user) => {
         return resolve(true);
       }
-      catch (err) {
-        console.log("[Error] [UserController] createUserDB error: ", err);
-        return reject({ err: DbMessage.USER_SAVED_ERROR })
-      }
+      ).catch ((err) => {
+        const errors = this.handleErrors(err);
+        return reject(errors); 
+      })
     })
   }
 
   doUserExist(username) {
     return new Promise((resolve, reject) => {
       UserModel.find({username: username}, (err, docs) => {
-        if (err) throw err;
+        if (err) return reject(err);
         if (docs.length>0) {
           return resolve(true);
         };
@@ -73,9 +82,18 @@ class UserController {
     })
   }
 
-  login_post(username, password) {
-    return UserModel.login(username, password)
-      
+  async loginPost(username, password) {
+    const user = await UserModel.findOne({username: username});
+    if (user) {
+      const auth = await bcrypt.compare(password, user.password);
+      if (auth) {
+        return user;
+      }
+      else {
+        throw Error("Incorrect password");
+      }
+    }
+    else throw Error("User not existed!");
   }
 }
 
