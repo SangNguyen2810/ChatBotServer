@@ -1,9 +1,9 @@
 import UserModel from "../model/userModel";
 import DbMessage from "../../static/dbMessage";
+import connect from '../mongoManager';
 
 class UserController {
   constructor() {}
-
   async createUser(
     username,
     password,
@@ -41,36 +41,44 @@ class UserController {
   }
 
   createUserDB(username, password, email, firstName, lastName, dateOfBirth) {
-    return new Promise((resolve, reject) => {
-      const loggedInUser = new UserModel({
+    return new Promise ((resolve, reject) => {
+      let user = new UserModel({
         username,
         password,
         email,
         firstName,
         lastName,
-        dateOfBirth,
+        dateOfBirth
       });
-      loggedInUser.create((err, a) => {
-        if (err) {
-          console.log("[Error] [UserController] createUserDB error: ", err);
-          return reject({ err: DbMessage.USER_SAVED_ERROR });
-        }
-        return resolve({ err: null });
-      });
-    });
+      try {
+        user.save();
+        return resolve(true);
+      }
+      catch (err) {
+        console.log("[Error] [UserController] createUserDB error: ", err);
+        return reject({ err: DbMessage.USER_SAVED_ERROR })
+      }
+    })
   }
 
   doUserExist(username) {
     return new Promise((resolve, reject) => {
-      UserModel.findOne({ where: username }, (e, docs) => {
-        if (docs.length) {
+      UserModel.find({username: username}, (err, docs) => {
+        if (err) throw err;
+        if (docs.length>0) {
           return resolve(true);
-        }
+        };
         return resolve(false);
-      });
-    });
+      }) 
+    })
+  }
+
+  login_post(username, password) {
+    return UserModel.login(username, password)
+      
   }
 }
+
 
 const userControllerInstance = new UserController();
 

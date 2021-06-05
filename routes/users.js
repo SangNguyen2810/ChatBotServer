@@ -1,7 +1,16 @@
 import express from "express";
 import UserMessage from "../static/userMessage";
 import UserController from "../db/controller/userController";
+import jwt from "jsonwebtoken";
+import config from "../config";
 
+const maxAge = 1 * 24 * 60 * 60; // maxAge of 1 day
+const createToken = (id) => {
+  console.log(config.secret);
+  return jwt.sign({ id }, config.secret, {
+      expiresIn: maxAge
+  });
+};
 const router = express.Router();
 
 router.post("/register", async (req, res) => {
@@ -30,3 +39,26 @@ router.post("/register", async (req, res) => {
     );
   }
 });
+
+router.post("/login", async (req, res) => {
+  const {username, password} = req.body;
+  UserController.login_post(username, password)
+    .then((user) => {
+      console.log("generating token");
+      const token = createToken(user._id);
+      console.log("Done generating token");
+      res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 7 });
+      res.status(201).json({
+       user: user._id,
+       token: token
+      });
+    })
+    .catch((err) => {
+      const message = err.message;
+      res.status(400).json({ errors: message })
+    })
+});
+
+
+
+export default router;
