@@ -7,7 +7,6 @@ const maxAge = 1 * 60 * 60;
 const authenticateJWT = (req,res,next) => {
     //Adding authentication for every route, except login/register
     if (req.path == "/user/register"|| req.path == "/user/login" ) {
-        console.log("abcd");
         return next();
     }
     else {
@@ -21,13 +20,12 @@ const authenticateJWT = (req,res,next) => {
                 }
                 else {
                     //Sending userID after decoded
-                    req.userId = decodedToken;
+                    req.userId = decodedToken.id;
                     next();
                 }
             })
         }
         else {
-            console.log("abcd");
             res.sendStatus(401);
         }
     }

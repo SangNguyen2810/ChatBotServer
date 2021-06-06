@@ -30,10 +30,9 @@ class UserController {
         const exist = await this.doUserExist(username);
         console.log("createUser exist: ", exist);
         if (exist) {
-          return resolve({
+          return reject({
             err: DbMessage.USER_ALREADY_EXISTS,
             username,
-            password,
           });
         } else {
           this.createUserDB(
