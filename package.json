@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon --exec babel-node app.js",
     "build": "babel  src -d build",
-    "start": "yarn build && node app.js"
+    "start": "nodemon --exec babel-node app.js"
   },
   "repository": {
     "type": "git",
