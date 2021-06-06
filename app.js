@@ -4,12 +4,18 @@ import UserController from "./db/controller/userController";
 import router from "./routes/users.js";
 import authenticateJWT from "./middleware/authMiddleware.js";
 import cookieParser from 'cookie-parser';
+import cors from "cors";
 
 
 
 const startApp = () => {
   const app = express();
-  const port = process.env.PORT || 8001;
+  const port = process.env.PORT || 8000;
+  const corsOptions = {
+    origin: "http://localhost:3000",
+    optionSuccessStatus: 200,
+  }
+  app.use(cors(corsOptions));
   app.get("/hello", (req, res) => res.send("hello world from cules coding"));
   app.listen(port, () => console.log(`Server is running on ${port}`));
   app.use(cookieParser());
