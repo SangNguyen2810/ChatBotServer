@@ -44,22 +44,20 @@ class UserController {
             lastName,
             dateOfBirth)
             .then((res) => {
-              console.log("Sang dep trai res: ",res);
-              return resolve({message: DbMessage.CREATE_USER_SUCCESS});
+              return resolve({ 
+                id: res,
+                message: DbMessage.CREATE_USER_SUCCESS
+              });
             })
             .catch((err) => {
-              console.log("Sang dep trai res: ",err);
               return reject(err);
             });
         }
       } catch (e) {
 
         return reject(e);
-
       }
     })
-
-
   }
 
   createUserDB(username, password, email, firstName, lastName, dateOfBirth) {
@@ -70,14 +68,14 @@ class UserController {
         email,
         firstName,
         lastName,
-        dateOfBirth
-      }).then((user) => {
-          return resolve(true);
-        }
-      ).catch((err) => {
-        const errors = this.handleErrors(err);
-        return reject(errors);
-      })
+        dateOfBirth})
+        .then((user) => {
+          return resolve(user._id);
+        })
+        .catch((err) => {
+          const errors = this.handleErrors(err);
+          return reject(errors);
+        })
     })
   }
 
@@ -104,6 +102,23 @@ class UserController {
         throw Error("Incorrect password");
       }
     } else throw Error("User not existed!");
+  }
+
+  async findById (id) {
+    return new Promise((resolve, reject) => {
+      console.log('User Controller: Finding user by ID');
+      UserModel.findById(id, {password: 0}, (err,user) => {
+        if (err) {
+          console.log('findByID err');
+          return reject("There was a problem finding user");
+        }
+        else if (!user) {
+          console.log("findByID: not found user");
+          return reject("Cannot found");
+        }
+        else return resolve(user);
+      })
+    })
   }
 }
 

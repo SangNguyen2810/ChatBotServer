@@ -21,6 +21,7 @@ router.post("/register", async (req, res) => {
     errors.push({ err: UserMessage.FIELDS_CAN_NOT_EMPTY });
   }
 
+  console.log(password);
   if (password.length < 6) {
     errors.push({ err: UserMessage.PASSWORD_NOT_ENOUGH_LENGTH });
   }
@@ -36,7 +37,11 @@ router.post("/register", async (req, res) => {
       lastName,
       dateOfBirth)
       .then ((result) => {
-        res.json({result});
+        const token = createToken(result.id);
+        res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 7 });
+        res.status(201).json({
+          message: result.message, //Register succeed
+        });
       })
       .catch((err)=>{
         res.json({err})
@@ -51,8 +56,9 @@ router.post("/login", async (req, res) => {
       const token = createToken(user._id);
       res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 7 });
       res.status(201).json({
-       user: user._id,
-       token: token
+        message: "Login succeed!",
+        user: user.username,
+        email: user.email
       });
     })
     .catch((err) => {
@@ -60,6 +66,29 @@ router.post("/login", async (req, res) => {
       res.status(400).json({ errors: message })
     })
 });
+
+router.get("/me", async (req,res) => {
+  console.log(req.cookies);
+  const token = req.cookies.jwt;
+    if (token){
+        jwt.verify(token, config.secret, (err, decodedToken) => {
+            if (err) {
+                console.log(err.message);
+                res.status(403).send("INVALIDATED TOKEN");
+            }
+            else {
+                //Sending userID after decoded
+                UserController.findById(decodedToken.id)
+                  .then((user) => {
+                    res.json(user)
+                  })
+                  .catch((err) => {
+                    res.send("Token expired or Invalidated Token");
+                  })
+            }
+        })
+    }
+})
 
 
 

@@ -2,6 +2,8 @@ import express from "express";
 import MongoManager from "./db/mongoManager";
 import UserController from "./db/controller/userController";
 import router from "./routes/users.js";
+import authenticateJWT from "./middleware/authMiddleware.js";
+import cookieParser from 'cookie-parser';
 
 
 
@@ -10,8 +12,13 @@ const startApp = () => {
   const port = process.env.PORT || 8001;
   app.get("/hello", (req, res) => res.send("hello world from cules coding"));
   app.listen(port, () => console.log(`Server is running on ${port}`));
+  app.use(cookieParser());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+  
+
+  //Adding authentication JWT for every route, except login/register
+  app.all('*',authenticateJWT);
   app.use("/user",router);
   
 };
