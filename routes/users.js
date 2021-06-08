@@ -3,6 +3,7 @@ import UserMessage from "../static/userMessage";
 import UserController from "../db/controller/userController";
 import jwt from "jsonwebtoken";
 import config from "../config";
+import DbError from "../static/db-error";
 
 const maxAge = 1 * 24 * 60 * 60; // maxAge of 1 day
 const createToken = (id) => {
@@ -13,11 +14,10 @@ const createToken = (id) => {
 const router = express.Router();
 
 router.post("/register", async (req, res) => {
-  const { username, password, email, firstName, lastName, dateOfBirth } =
+  const { username, password, email, firstName, lastName } =
     req.body;
   let errors = [];
-
-  if (!firstName || !lastName || !username || !email || !dateOfBirth) {
+  if (!firstName || !lastName || !username || !email) {
     errors.push({ err: UserMessage.FIELDS_CAN_NOT_EMPTY });
   }
 
@@ -34,8 +34,7 @@ router.post("/register", async (req, res) => {
       password,
       email,
       firstName,
-      lastName,
-      dateOfBirth)
+      lastName)
       .then ((result) => {
         const token = createToken(result.id);
         res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 7 });
@@ -44,7 +43,8 @@ router.post("/register", async (req, res) => {
         });
       })
       .catch((err)=>{
-        res.json({err})
+        res.status(DbError.USER_ALREADY_EXISTS).json({err});
+        // res.json(err)
       })
   }
 });

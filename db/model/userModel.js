@@ -28,10 +28,6 @@ const UserSchema = new Schema({
     type: String,
     required: true,
   },
-  dateOfBirth: {
-    type: Date,
-    required: true,
-  },
 
 });
 

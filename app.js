@@ -12,7 +12,7 @@ const startApp = () => {
   const app = express();
   const port = process.env.PORT || 8000;
   const corsOptions = {
-    origin: "http://localhost:3000/",
+    origin: "http://localhost:3000",
     optionSuccessStatus: 200,
   }
   app.use(cors(corsOptions));
@@ -29,6 +29,7 @@ const startApp = () => {
 
 };
 
+startApp();
 // const createUser = async (username, password, email, firstName, lastName, dateOfBirth) => {
 //   let message = await UserController.createUser(username, password, email, firstName, lastName, dateOfBirth);
 //

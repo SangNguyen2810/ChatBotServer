@@ -1,5 +1,5 @@
 import UserModel from "../model/userModel";
-import DbMessage from "../../static/dbMessage";
+import DbMessage from "../../static/db-error";
 import connect from '../mongoManager';
 import bcrypt from 'bcrypt';
 
@@ -22,8 +22,7 @@ class UserController {
     password,
     email,
     firstName,
-    lastName,
-    dateOfBirth
+    lastName
   ) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -32,7 +31,6 @@ class UserController {
         if (exist) {
           return reject({
             err: DbMessage.USER_ALREADY_EXISTS,
-            username,
           });
         } else {
           this.createUserDB(
@@ -40,8 +38,7 @@ class UserController {
             password,
             email,
             firstName,
-            lastName,
-            dateOfBirth)
+            lastName)
             .then((res) => {
               return resolve({ 
                 id: res,
@@ -66,8 +63,7 @@ class UserController {
         password,
         email,
         firstName,
-        lastName,
-        dateOfBirth})
+        lastName})
         .then((user) => {
           return resolve(user._id);
         })
@@ -85,7 +81,6 @@ class UserController {
         if (docs.length > 0) {
           return resolve(true);
         }
-        ;
         return resolve(false);
       })
     })
@@ -105,14 +100,11 @@ class UserController {
 
   async findById (id) {
     return new Promise((resolve, reject) => {
-      console.log('User Controller: Finding user by ID');
       UserModel.findById(id, {password: 0}, (err,user) => {
         if (err) {
-          console.log('findByID err');
           return reject("There was a problem finding user");
         }
         else if (!user) {
-          console.log("findByID: not found user");
           return reject("Cannot found");
         }
         else return resolve(user);
