@@ -1,5 +1,6 @@
 import UserModel from "../model/userModel";
 import DbMessage from "../../static/dbMessage";
+import apiMessage from "../../static/apiMessage";
 import connect from '../mongoManager';
 import bcrypt from 'bcrypt';
 
@@ -98,9 +99,9 @@ class UserController {
       if (auth) {
         return user;
       } else {
-        throw Error("Incorrect password");
+        throw Error(apiMessage.INCORRECT_PASSWORD);
       }
-    } else throw Error("User not existed!");
+    } else throw Error(apiMessage.INCORRECT_USERNAME);
   }
 
   async findById (id) {
@@ -109,11 +110,11 @@ class UserController {
       UserModel.findById(id, {password: 0}, (err,user) => {
         if (err) {
           console.log('findByID err');
-          return reject("There was a problem finding user");
+          return reject(DbMessage.DBERROR_FIND_USER_BY_ID);
         }
         else if (!user) {
           console.log("findByID: not found user");
-          return reject("Cannot found");
+          return reject(apiMessage.NOT_FOUND_USER);
         }
         else return resolve(user);
       })

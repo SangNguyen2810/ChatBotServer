@@ -3,6 +3,7 @@ import UserMessage from "../static/userMessage";
 import UserController from "../db/controller/userController";
 import jwt from "jsonwebtoken";
 import config from "../config";
+import apiMessage from "../static/apiMessage";
 
 const maxAge = 1 * 24 * 60 * 60; // maxAge of 1 day
 const createToken = (id) => {
@@ -37,8 +38,6 @@ router.post("/register", async (req, res) => {
       lastName,
       dateOfBirth)
       .then ((result) => {
-        const token = createToken(result.id);
-        res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 7 });
         res.status(201).json({
           message: result.message, //Register succeed
         });
@@ -56,7 +55,7 @@ router.post("/login", async (req, res) => {
       const token = createToken(user._id);
       res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 7 });
       res.status(201).json({
-        message: "Login succeed!",
+        message: apiMessage.LOGIN_SUCCEED,
         user: user.username,
         email: user.email
       });
@@ -74,7 +73,7 @@ router.get("/me", async (req,res) => {
         jwt.verify(token, config.secret, (err, decodedToken) => {
             if (err) {
                 console.log(err.message);
-                res.status(403).send("INVALIDATED TOKEN");
+                res.status(403);
             }
             else {
                 //Sending userID after decoded
@@ -83,7 +82,7 @@ router.get("/me", async (req,res) => {
                     res.json(user)
                   })
                   .catch((err) => {
-                    res.send("Token expired or Invalidated Token");
+                    res.send(apiMessage.TOKEN_EXPIRE_INVALIDATE);
                   })
             }
         })
