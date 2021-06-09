@@ -1,9 +1,12 @@
 import express from "express";
 import UserMessage from "../static/userMessage";
 import UserController from "../db/controller/userController";
+import MsgController from "../db/controller/msgController";
 import jwt from "jsonwebtoken";
 import config from "../config";
 import apiMessage from "../static/apiMessage";
+import mongoose from 'mongoose';
+import MsgModel from "../db/model/msgModel";
 
 const maxAge = 1 * 24 * 60 * 60; // maxAge of 1 day
 const createToken = (id) => {
@@ -89,6 +92,23 @@ router.get("/me", async (req,res) => {
     }
 })
 
+router.post("/chat", async (req,res) => {
+  const {channel_id, username, message} = req.body;
+  const c_id = mongoose.Types.ObjectId(channel_id);
+  MsgController.createMsg(c_id, username, message)
+    .then((result) => {
+      res.status(201).json({
+        message: apiMessage.CHAT_SUCCEED,
+        channel_id: channel_id,
+        username: username,
+        chat_message: message,
+      });
+    })
+    .catch((err) => {
+      const msg = err.message;
+      res.status(400).json({error: msg});
+    })
+})
 
 
 export default router;

@@ -6,6 +6,10 @@ import authenticateJWT from "./middleware/authMiddleware.js";
 import cookieParser from 'cookie-parser';
 import cors from "cors";
 
+import MsgController from "./db/controller/msgController";
+import ChannelModel from "./db/model/channelModel";
+import MsgModel from "./db/model/msgModel";
+var mongoose = require('mongoose');
 
 
 const startApp = () => {
@@ -26,13 +30,38 @@ const startApp = () => {
   //Adding authentication JWT for every route, except login/register
   app.all('*',authenticateJWT);
   app.use("/user",router);
-
 };
 
-// const createUser = async (username, password, email, firstName, lastName, dateOfBirth) => {
-//   let message = await UserController.createUser(username, password, email, firstName, lastName, dateOfBirth);
-//
-// };
-//
-//
-// createUser('Sang', '123',"1","1","1",1)
+startApp();
+
+  //ChannelModel.create({
+  //  channel_name: 'hahaha',
+  //  num_message: 0
+  //}).then((channel) => {
+  //  console.log(channel._id);
+  //}).catch((err) => {
+  //  console.log(err.message);
+  //});
+  //console.log("Created channel");
+
+ 
+  //const createMessage = async(username, channel_id, message) => {
+  //  let a = await MsgController.createMsg(username, channel_id, message);
+  //};
+  //const usname = "QuanPham";
+
+  //const msg = "HAHAHAHAHAHAHAHAHAAHH ffqfqfqfqfqfjojo fkoqkoqkgoqkogk";
+
+  //ChannelModel.findOne({channel_name: 'hahaha'}, (err,channel) => {
+  //  const channel_id = channel._id;
+  //  createMessage(usname,channel_id,msg);
+  //  console.log("Created msg");
+  //})
+  //const object = mongoose.Types.ObjectId('60c0ff4540a3a35c1ef5d9a1');
+  //ChannelModel.findOne({_id: object}, (err,channel) => {
+  //  console.log(channel);
+  //})
+
+  
+
+
