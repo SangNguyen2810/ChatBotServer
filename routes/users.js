@@ -5,13 +5,10 @@ import MsgController from "../db/controller/msgController";
 import jwt from "jsonwebtoken";
 import config from "../config";
 import apiMessage from "../static/apiMessage";
-<<<<<<< HEAD
 import mongoose from 'mongoose';
 import MsgModel from "../db/model/msgModel";
-
-=======
 import cookieParser from 'cookie-parser';
->>>>>>> d2dc1920d7aa67fde0af86c1cabd178de9b64bba
+
 const maxAge = 1 * 24 * 60 * 60; // maxAge of 1 day
 const createToken = (id) => {
   return jwt.sign({id}, config.secret, {
