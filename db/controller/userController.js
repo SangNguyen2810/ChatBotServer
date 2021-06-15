@@ -14,7 +14,12 @@ class UserController {
     if (err._message.includes('User validation failed')) {
       Object.values(err.errors).forEach(({properties}) => {
         errors[properties.path] = properties.message;
-      });
+      }); 
+    }
+    else if (err._message.includes('Channel validation failed')) {
+      Object.values(err.errors).forEach(({properties}) => {
+        errors[properties.path] = properties.message;
+      }); 
     }
     return errors;
   }
@@ -247,8 +252,10 @@ class UserController {
             })
           }
           catch (e) {
+            const errors = this.handleErrors(e);
             console.log(DbMessage.DBERROR_CREATING_CHANNEL);
-            return reject (DbMessage.DBERROR_CREATING_CHANNEL);
+            console.log(errors);
+            return reject (errors);
           }
         }
       }
