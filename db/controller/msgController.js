@@ -1,5 +1,6 @@
 import MsgModel from "../model/msgModel";
 import ChannelModel from "../model/channelModel";
+import UserModel from "../model/userModel";
 import DbMessage from "../../static/dbMessage";
 import apiMessage from "../../static/apiMessage";
 import connect from '../mongoManager';
@@ -30,38 +31,72 @@ class MsgController {
 
   async createMsg(
     channel_id,
-    username,
+    user_id,
     message
   ) {
     return new Promise(async (resolve, reject) => {
       //Split message into chunk of messages with approriate length to put in db
-
-      ChannelModel.findById({_id: channel_id}, (err, channel) => {
-        if (err) {
-          return reject (err.message);
+      try {
+        const user = await UserModel.findById(user_id, {password: 0});
+        if (!user) {
+          //Wrong ID means Token is wrong/invalidate
+          console.log(apiMessage.TOKEN_EXPIRE_INVALIDATE);
+          return reject(apiMessage.TOKEN_EXPIRE_INVALIDATE);
         }
-        else {
-          console.log("findID");
-          const message_id = channel.num_message;
-          console.log(message_id);
-          const chunkMsg = this.chunkMsg(message);
-          for (let i = 0; i< chunkMsg.length; ++i) {
-            let msg = chunkMsg[i];
-            MsgModel.create({
-              channel_id: channel_id,
-              message_id: message_id,
-              part_id: i,
-              username: username,
-              message_text: msg
-            }).catch((err) => {
-              return reject (err.message);
-            }) 
+        else try {
+          const channel = await ChannelModel.findById(channel_id);
+          if (!channel) {
+            console.log(apiMessage.NOT_FOUND_CHANNEL);
+            return reject (apiMessage.NOT_FOUND_CHANNEL);
           }
-          channel.num_message = channel.num_message+1;
-          channel.save();
-          return resolve(true);
+          else if (!channel.listUser.includes(user_id)) {
+            console.log(apiMessage.USER_NOT_IN_CHANNEL);
+            return reject (apiMessage.USER_NOT_IN_CHANNEL);
+          }
+          else {
+            const message_id = channel.num_message;
+            const chunkMsg = this.chunkMsg(message);
+            for (let i = 0; i< chunkMsg.length; ++i) {
+              let msg = chunkMsg[i];
+              try {
+                console.log(i);
+                await MsgModel.create({
+                  channel_id: channel_id,
+                  message_id: message_id,
+                  part_id: i,
+                  username: user.username,
+                  message_text: msg
+                })
+              }
+              catch (e) {
+                //de tam
+                console.log('error at:' + i + 'th chunk of total ' + chunkMsg.length + ' chunks');
+                console.log(DbMessage.DBERROR_SAVING_MESSAGE);
+                if (i != 0){
+                  channel.num_message = channel.num_message+1;
+                  channel.save();
+                }
+                return reject (DbMessage.DBERROR_SAVING_MESSAGE);
+              }   
+            }
+            channel.num_message = channel.num_message+1;
+            channel.save();
+            return resolve({
+              username: user.username,
+              //Message created time = channel current updated time
+              createdAt: channel.updatedAt, 
+            });
+          }
+        } 
+        catch (e) {
+          console.log(DbMessage.DBERROR_FIND_CHANNEL_BY_ID);
+          return reject (DbMessage.DBERROR_FIND_CHANNEL_BY_ID);
         }
-      })
+      }
+      catch (e) {
+        console.log(DbMessage.DBERROR_FIND_USER_BY_ID);
+        return reject(DbMessage.DBERROR_FIND_USER_BY_ID);
+      }
     })
   }
 }

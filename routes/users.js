@@ -72,59 +72,98 @@ router.post("/login", async (req, res) => {
   UserController.loginPost(username, password)
     .then((user) => {
       const token = createToken(user._id);
-      console.log("Sang dep trai token:",token)
-      res
-        .cookie('jwt', token, {httpOnly: true, secure: true,maxAge: maxAge * 7})
-        .status(201)
-        .json({
+      res.cookie('jwt', token, {httpOnly: true,maxAge: maxAge * 7});
+      res.status(201).json({
         message: apiMessage.LOGIN_SUCCEED,
+        user: username,
         token: token
       });
     })
     .catch((err) => {
-      const message = err.message;
-      res.status(400).json({errors: message})
+      res.status(400).json({errors: err})
     })
 });
 
+//check status
 router.get("/me", async (req, res) => {
-  console.log(req.cookies);
-  const token = req.cookies.jwt;
-  if (token) {
-    jwt.verify(token, config.secret, (err, decodedToken) => {
-      if (err) {
-        console.log(err.message);
-        res.status(403);
-      } else {
-        //Sending userID after decoded
-        UserController.findById(decodedToken.id)
-          .then((user) => {
-            res.json(user)
-          })
-          .catch((err) => {
-            res.send(apiMessage.TOKEN_EXPIRE_INVALIDATE);
-          })
-      }
+  UserController.findById(req.user_id)
+    .then((user) => {
+      res.json(user)
     })
-  }
+    .catch((err) => {
+      res.send(apiMessage.TOKEN_EXPIRE_INVALIDATE);
+    });
 })
 
-router.post("/chat", async (req,res) => {
-  const {channel_id, username, message} = req.body;
-  const c_id = mongoose.Types.ObjectId(channel_id);
-  MsgController.createMsg(c_id, username, message)
+//chat in channel
+router.post("/chat/:channel_id", async (req,res) => {
+  const {message} = req.body;
+  const c_id = mongoose.Types.ObjectId(req.params.channel_id);
+  MsgController.createMsg(c_id, req.user_id, message) //user_id get from authMiddleware
     .then((result) => {
       res.status(201).json({
         message: apiMessage.CHAT_SUCCEED,
-        channel_id: channel_id,
-        username: username,
+        channel_id: req.params.channel_id,
+        username: result.username,
         chat_message: message,
+        createdAt: result.createdAt
       });
     })
     .catch((err) => {
-      const msg = err.message;
-      res.status(400).json({error: msg});
+      res.status(400).json({error: err});
     })
+})
+
+//adding Friend
+router.post("/addFriend", async (req,res) => {
+  const {friendName} = req.body;
+  UserController.addFriend(req.user_id,friendName) //user_id get from authMiddleware
+    .then((result) => {
+      res.status(201).json({message: apiMessage.ADD_FRIEND_SUCCEED});
+    })
+    .catch((err) => {
+      res.status(400).json({error: err});
+    })
+})
+
+//creating channel
+router.post("/createChannel", async (req,res) => {
+  const {channel_name} = req.body;
+  UserController.createChannel(req.user_id, channel_name) //user_id get from authMiddleware
+    .then((channel) => {
+      res.status(201).json({
+        message: apiMessage.CREATING_CHANNEL_SUCCEED,
+        channel_name: channel.channel_name,
+        current_user: channel.listUser.length
+      })
+    })
+    .catch((err) => {
+      res.status(400).json({error: err});
+    })
+})
+
+//join channel
+router.post("/joinChannel", async (req,res) => {
+  const {channel_id} = req.body;
+  const c_id = mongoose.Types.ObjectId(channel_id);
+  UserController.joinChannel(req.user_id, c_id) //user_id get from authMiddleware
+    .then((channel) => {
+      res.status(201).json({
+        message: apiMessage.JOIN_CHANNEL_SUCCEED,
+        channel_name: channel.channel_name,
+        current_user: channel.listUser.length
+      })
+    })
+    .catch((err) => {
+      res.status(400).json({error: err});
+    })
+})
+
+
+router.get("/logout", async (req,res) => {
+  res.cookie('jwt','',{maxAge: 1});
+  res.json(apiMessage.LOGOUT_DONE);
+  //res.redirect('/');
 })
 
 export default router;

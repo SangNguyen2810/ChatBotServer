@@ -15,12 +15,12 @@ const authenticateJWT = (req,res,next) => {
             jwt.verify(token, config.secret, (err, decodedToken) => {
                 if (err) {
                     console.log(err.message);
-                    res.status(403).send("INVALIDATED TOKEN");
+                    res.status(403);
                     res.redirect("/login");
                 }
                 else {
                     //Sending userID after decoded
-                    req.userId = decodedToken.id;
+                    req.user_id = decodedToken.id;
                     next();
                 }
             })

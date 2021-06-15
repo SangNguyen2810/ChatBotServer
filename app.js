@@ -21,16 +21,15 @@ const startApp = () => {
     credentials: true,
   }
   app.use(cors(corsOptions));
-  app.use(bodyParser.urlencoded({extended: true}));
 
   app.get("/hello", (req, res) => res.send("hello world from cules coding"));
   app.listen(port, () => console.log('Server is running on ${port}'));
-  app.use(bodyParser.urlencoded({ extended: false }))
   app.use(cookieParser());
 
 
   app.use(express.json());
   app.use(express.urlencoded({extended: true}));
+  //tam thoi bo qua------
   app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Allow-Origin', req.headers.origin);

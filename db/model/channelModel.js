@@ -4,12 +4,6 @@ import dbMessage from '../../static/dbMessage';
 
 const ChannelSchema = new Schema(
   { 
-    /*
-    channel_id: {
-      type: Number,
-      required: [true, dbMessage.ERROR_EMPTY_CHANNEL_ID],
-      unique: true
-    },*/
     channel_name: {
       type: String,
       required: [true, dbMessage.ERROR_EMPTY_CHANNELNAME]
@@ -17,7 +11,10 @@ const ChannelSchema = new Schema(
     num_message: {
       type: Number,
       default: 0
-    }
+    },
+    listUser: [{
+      type: Schema.Types.ObjectId
+    }]
   },
   {
     timestamps: {
