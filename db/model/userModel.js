@@ -37,7 +37,8 @@ const UserSchema = new Schema({
     type: Schema.Types.ObjectId
   }],
   listChannel: [{
-    type: Schema.Types.ObjectId
+    type: Schema.Types.ObjectId,
+    ref: 'Channel'
   }]
 });
 

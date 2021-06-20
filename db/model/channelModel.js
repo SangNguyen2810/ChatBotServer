@@ -4,16 +4,17 @@ import dbMessage from '../../static/dbMessage';
 
 const ChannelSchema = new Schema(
   { 
-    channel_name: {
+    channelName: {
       type: String,
       required: [true, dbMessage.ERROR_EMPTY_CHANNELNAME]
     },
-    num_message: {
+    numMessage: {
       type: Number,
       default: 0
     },
     listUser: [{
-      type: Schema.Types.ObjectId
+      type: Schema.Types.ObjectId,
+      ref: "User",
     }]
   },
   {

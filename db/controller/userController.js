@@ -1,5 +1,7 @@
 import UserModel from "../model/userModel";
 import ChannelModel from "../model/channelModel";
+import MsgModel from "../model/msgModel";
+import MsgController from "../controller/msgController";
 import DbMessage from "../../static/dbMessage";
 import apiMessage from "../../static/apiMessage";
 import connect from '../mongoManager';
@@ -141,11 +143,11 @@ class UserController {
     })
   }
 
-  async addFriend (user_id, friendName) {
+  async addFriend (userId, friendName) {
     return new Promise (async (resolve, reject) => {
       console.log("Adding friend");
       try {
-        const user = await UserModel.findById(user_id);
+        const user = await UserModel.findById(userId);
         if (!user) {
           //Wrong ID means Token is wrong/invalidate
           console.log(apiMessage.TOKEN_EXPIRE_INVALIDATE);
@@ -187,21 +189,21 @@ class UserController {
     })
   }
 
-  async joinChannel (user_id, channel_id) {
+  async joinChannel (userId, channelId) {
     return new Promise (async (resolve, reject) => {
       try {
-        const user = await UserModel.findById(user_id);
+        const user = await UserModel.findById(userId);
         if (!user) {
           //Wrong ID means Token is wrong/invalidate
           console.log(apiMessage.TOKEN_EXPIRE_INVALIDATE);
           return reject(apiMessage.TOKEN_EXPIRE_INVALIDATE);
         }
-        else if (user.listChannel.includes(channel_id)) {
+        else if (user.listChannel.includes(channelId)) {
           console.log(apiMessage.USER_ALREADY_IN_CHANNEL);
           return reject (apiMessage.USER_ALREADY_IN_CHANNEL);
         }
         else try {
-          const channel = await ChannelModel.findById(channel_id);
+          const channel = await ChannelModel.findById(channelId);
           if (!channel) {
             console.log(apiMessage.NOT_FOUND_CHANNEL);
             return reject (apiMessage.NOT_FOUND_CHANNEL);
@@ -231,10 +233,10 @@ class UserController {
     })
   }
 
-  async createChannel (user_id, channel_name) {
+  async createChannel (userId, channelName) {
     return new Promise (async (resolve, reject) => {
       try {
-        const user = await UserModel.findById(user_id);
+        const user = await UserModel.findById(userId);
         if (!user) {
           //Wrong ID means Token is wrong/invalidate
           console.log(apiMessage.TOKEN_EXPIRE_INVALIDATE);
@@ -243,8 +245,8 @@ class UserController {
         else {
           try {
             await ChannelModel.create({
-              channel_name: channel_name,
-              listUser: [user_id]
+              channelName: channelName,
+              listUser: [userId]
             }).then((channel) => {
               user.listChannel.push(channel._id);
               user.save();
@@ -254,7 +256,6 @@ class UserController {
           catch (e) {
             const errors = this.handleErrors(e);
             console.log(DbMessage.DBERROR_CREATING_CHANNEL);
-            console.log(errors);
             return reject (errors);
           }
         }
@@ -266,7 +267,81 @@ class UserController {
     })
   }
 
+  async getChannel(userId) {
+    return new Promise (async (resolve, reject) => {
+      await UserModel.findById(userId).populate({
+        path: 'listChannel', 
+        select: ['channelName', '_id', 'listUser'],
+        perDocumentLimit: 10,
+        options: {
+          sort: {updatedAt: -1},
+        },
+        populate: {
+          path: 'listUser',
+          select: ['_id', 'username'],
+        }
+      }).exec(async function (err, user){
+        if (err) {
+          return reject(err);
+        }
+        else {
+          var channels = user.listChannel;
+          async function res(channels) {
+            async function getMsgChannel(channel) {
+              return new Promise (async (resolve) => {
+                try {
+                  const msg = await MsgModel.find({channelId: channel._id})
+                    .sort({createdAt: -1})
+                    .limit(1)
+                    .exec(); 
+                  if (msg[0].msgType == 0) {
+                    const channelRes = {
+                      channel: channel,
+                      lastConversation: {
+                        content: msg[0].messageText,
+                        channelId: msg[0].channelId,
+                        messageId: msg[0].messageId,
+                        msgType: msg[0].msgType,
+                        sendTime: msg[0].created_at,
+                      }
+                    };
+                    return resolve(channelRes);
+                  }
+                  else if (msg[0].msgType == 1) {
+                    const text = await MsgController.getFullTextMsg(msg[0]);
+                    const channelRes = {
+                      channel: channel,
+                      lastConversation: text
+                    }
+                    return resolve(channelRes);
+                  }  
+                }
+                catch (e) {
+                  const error = {
+                    channel: channel,
+                    error: e,
+                  }
+                  return resolve(error);
+                }
+              })
+            }
+            const result = await Promise.all(channels.map(getMsgChannel));    
+            return result;
+          }
+          try {
+            const result = await res(channels); 
+            return resolve(result);
+          }
+          catch (e) {
+            return reject (e);
+          }
+          
+        }
+      })      
+    })
+  }
 }
+
 
 
 const userControllerInstance = new UserController();

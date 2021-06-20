@@ -1,7 +1,9 @@
 import jwt from "jsonwebtoken";
 import connect from "../db/mongoManager";
 import config from "../config";
-import UserController from "../db/model/userModel";
+import UserModel from "../db/model/userModel";
+import DbMessage from "../static/dbMessage";
+import apiMessage from "../static/apiMessage";
 
 const maxAge = 1 * 60 * 60;
 const authenticateJWT = (req,res,next) => {
@@ -19,9 +21,18 @@ const authenticateJWT = (req,res,next) => {
                     res.redirect("/login");
                 }
                 else {
-                    //Sending userID after decoded
-                    req.user_id = decodedToken.id;
-                    next();
+                    UserModel.findById(decodedToken.id, (err, user) => {
+                        if (err) {
+                            res.send(DbMessage.DBERROR_FIND_USER_BY_ID);
+                        }
+                        else if (!user) {
+                            res.send(apiMessage.TOKEN_EXPIRE_INVALIDATE);
+                        }
+                        else {
+                            req.userId = decodedToken.id;
+                            next();
+                        }
+                    })
                 }
             })
         }

@@ -13,6 +13,8 @@ const Message = {
     USER_ALREADY_IN_CHANNEL: "User is already in channel!",
     USER_ALREADY_FRIEND: "Users are already friend with each other",
     USER_NOT_IN_CHANNEL: "User is not in channel!",
+    ALL_MSG_FAIL: "All message fail to save",
+    MSG_FAIL: "Message fail to save full",
 
 
 }

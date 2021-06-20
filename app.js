@@ -23,7 +23,7 @@ const startApp = () => {
   app.use(cors(corsOptions));
 
   app.get("/hello", (req, res) => res.send("hello world from cules coding"));
-  app.listen(port, () => console.log('Server is running on ${port}'));
+  app.listen(port, () => console.log(`Server is running on ${port}`));
   app.use(cookieParser());
 
 

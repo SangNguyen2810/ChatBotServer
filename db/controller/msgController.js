@@ -30,65 +30,86 @@ class MsgController {
   }
 
   async createMsg(
-    channel_id,
-    user_id,
+    channelId,
+    userId,
     message
   ) {
     return new Promise(async (resolve, reject) => {
       //Split message into chunk of messages with approriate length to put in db
       try {
-        const user = await UserModel.findById(user_id, {password: 0});
+        const user = await UserModel.findById(userId, {password: 0});
         if (!user) {
           //Wrong ID means Token is wrong/invalidate
           console.log(apiMessage.TOKEN_EXPIRE_INVALIDATE);
           return reject(apiMessage.TOKEN_EXPIRE_INVALIDATE);
         }
         else try {
-          const channel = await ChannelModel.findById(channel_id);
+          const channel = await ChannelModel.findById(channelId);
           if (!channel) {
             console.log(apiMessage.NOT_FOUND_CHANNEL);
             return reject (apiMessage.NOT_FOUND_CHANNEL);
           }
-          else if (!channel.listUser.includes(user_id)) {
+          else if (!channel.listUser.includes(userId)) {
             console.log(apiMessage.USER_NOT_IN_CHANNEL);
             return reject (apiMessage.USER_NOT_IN_CHANNEL);
           }
           else {
-            const message_id = channel.num_message;
+            const messageId = channel.numMessage;
             const chunkMsg = this.chunkMsg(message);
+            var msgType = 0; //normal message
+            if (chunkMsg.length >1 )
+            {
+              msgType = 1; //multi message
+            }
+            const errors = [];
             for (let i = 0; i< chunkMsg.length; ++i) {
               let msg = chunkMsg[i];
               try {
-                console.log(i);
                 await MsgModel.create({
-                  channel_id: channel_id,
-                  message_id: message_id,
-                  part_id: i,
+                  channelId: channelId,
+                  messageId: messageId,
+                  partId: i,
                   username: user.username,
-                  message_text: msg
+                  msgType: msgType,
+                  messageText: msg
                 })
               }
               catch (e) {
                 //de tam
-                console.log('error at:' + i + 'th chunk of total ' + chunkMsg.length + ' chunks');
-                console.log(DbMessage.DBERROR_SAVING_MESSAGE);
-                if (i != 0){
-                  channel.num_message = channel.num_message+1;
-                  channel.save();
-                }
-                return reject (DbMessage.DBERROR_SAVING_MESSAGE);
+                const errorAt = (`error at ${i} chunk`);
+                const error = {
+                  errorAt: errorAt,
+                  error: e,
+                };
+                errors.push(error);
               }   
             }
-            channel.num_message = channel.num_message+1;
-            channel.save();
-            return resolve({
-              username: user.username,
-              //Message created time = channel current updated time
-              createdAt: channel.updatedAt, 
-            });
+            if (errors.length == chunkMsg.length) {
+              return reject (apiMessage.ALL_MSG_FAIL);
+            }
+            else {
+              channel.numMessage = channel.numMessage+1;
+              channel.save();
+              if (errors.length == 0) {
+                return resolve({
+                  username: user.username,
+                  //Message created time = channel current updated time
+                  createdAt: channel.updatedAt, 
+                });
+              }
+              else {
+                const error = {};
+                error['message'] = apiMessage.MSG_FAIL;
+                errors.forEach((err) => {
+                  error[err.errorAt] = err.error;
+                });
+                return reject(error);
+              }
+            }
           }
         } 
         catch (e) {
+          console.log(e);
           console.log(DbMessage.DBERROR_FIND_CHANNEL_BY_ID);
           return reject (DbMessage.DBERROR_FIND_CHANNEL_BY_ID);
         }
@@ -97,6 +118,32 @@ class MsgController {
         console.log(DbMessage.DBERROR_FIND_USER_BY_ID);
         return reject(DbMessage.DBERROR_FIND_USER_BY_ID);
       }
+    })
+  }
+
+  async getFullTextMsg (message) {
+    return new Promise (async (resolve, reject) => {
+      MsgModel
+        .find({messageId: message.messageId})
+        .exec(function (err, messages) {
+          if (err) {
+            return reject (err);
+          }
+          else {
+            var messageText = '';
+            messages.forEach((message) => {
+              messageText = messageText + message.messageText;
+            })
+            const result = {
+              content: messageText,
+              channelId: message.channelId,
+              messageId: message.messageId,
+              msgType: message.msgType,
+              sendTime: message.created_at,
+            };
+            return resolve(result);
+          }
+        })
     })
   }
 }

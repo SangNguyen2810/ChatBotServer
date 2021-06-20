@@ -4,15 +4,15 @@ import dbMessage from '../../static/dbMessage';
 
 const MsgSchema = new Schema(
   {
-    channel_id: {
+    channelId: {
       type: Schema.Types.ObjectId,
       required: [true, dbMessage.ERROR_EMPTY_CHANNEL_ID]
     },
-    message_id: {
+    messageId: {
       type: Number,
       required: [true, dbMessage.ERROR_EMPTY_MESSAGE_ID],
     },
-    part_id:{//Part of the message
+    partId:{//Part of the message
       type: Number,
       required: [true, dbMessage.ERROR_EMPTY_PART_ID],
     },
@@ -20,7 +20,11 @@ const MsgSchema = new Schema(
       type: String,
       required: [true, dbMessage.ERROR_EMPTY_USERNAME]
     },
-    message_text: {
+    msgType: {
+      type: Number,
+      required: true,
+    },
+    messageText: {
       type: String,
     }
   },

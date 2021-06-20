@@ -86,7 +86,7 @@ router.post("/login", async (req, res) => {
 
 //check status
 router.get("/me", async (req, res) => {
-  UserController.findById(req.user_id)
+  UserController.findById(req.userId)
     .then((user) => {
       res.json(user)
     })
@@ -95,29 +95,47 @@ router.get("/me", async (req, res) => {
     });
 })
 
+//getData
+router.get("/profile", async (req,res) => {
+  const {userId} = req.body;
+  const u_id = mongoose.Types.ObjectId(userId);
+  UserController.findById(u_id)
+  .then((user) => {
+    let result = {
+      userId: user._id,
+      username: user.username,
+      name: user.lastName + user.firstName,
+    };
+    res.json(result);
+  })
+  .catch((err) => {
+    res.send(apiMessage.NOT_FOUND_USER);
+  });
+})
+
 //chat in channel
-router.post("/chat/:channel_id", async (req,res) => {
+router.post("/chat/:channelId", async (req,res) => {
   const {message} = req.body;
-  const c_id = mongoose.Types.ObjectId(req.params.channel_id);
-  MsgController.createMsg(c_id, req.user_id, message) //user_id get from authMiddleware
+  const c_id = mongoose.Types.ObjectId(req.params.channelId);
+  MsgController.createMsg(c_id, req.userId, message) //userId get from authMiddleware
     .then((result) => {
       res.status(201).json({
         message: apiMessage.CHAT_SUCCEED,
-        channel_id: req.params.channel_id,
+        channelId: req.params.channelId,
         username: result.username,
-        chat_message: message,
+        chatMessage: message,
         createdAt: result.createdAt
       });
     })
     .catch((err) => {
-      res.status(400).json({error: err});
+      res.status(400).send(err);
     })
 })
 
 //adding Friend
 router.post("/addFriend", async (req,res) => {
   const {friendName} = req.body;
-  UserController.addFriend(req.user_id,friendName) //user_id get from authMiddleware
+  UserController.addFriend(req.userId,friendName) //userId get from authMiddleware
     .then((result) => {
       res.status(201).json({message: apiMessage.ADD_FRIEND_SUCCEED});
     })
@@ -129,12 +147,12 @@ router.post("/addFriend", async (req,res) => {
 //creating channel
 router.post("/createChannel", async (req,res) => {
   const {channel_name} = req.body;
-  UserController.createChannel(req.user_id, channel_name) //user_id get from authMiddleware
+  UserController.createChannel(req.userId, channel_name) //userId get from authMiddleware
     .then((channel) => {
       res.status(201).json({
         message: apiMessage.CREATING_CHANNEL_SUCCEED,
-        channel_name: channel.channel_name,
-        current_user: channel.listUser.length
+        channelName: channel.channel_name,
+        currentUser: channel.listUser.length
       })
     })
     .catch((err) => {
@@ -144,18 +162,29 @@ router.post("/createChannel", async (req,res) => {
 
 //join channel
 router.post("/joinChannel", async (req,res) => {
-  const {channel_id} = req.body;
-  const c_id = mongoose.Types.ObjectId(channel_id);
-  UserController.joinChannel(req.user_id, c_id) //user_id get from authMiddleware
+  const {channelId} = req.body;
+  const c_id = mongoose.Types.ObjectId(channelId);
+  UserController.joinChannel(req.userId, c_id) //userId get from authMiddleware
     .then((channel) => {
       res.status(201).json({
         message: apiMessage.JOIN_CHANNEL_SUCCEED,
-        channel_name: channel.channel_name,
-        current_user: channel.listUser.length
+        channelName: channel.channel_name,
+        currentUser: channel.listUser.length
       })
     })
     .catch((err) => {
       res.status(400).json({error: err});
+    })
+})
+
+//get Top channel
+router.get("/topChannel", async (req,res) => {
+  UserController.getChannel(req.userId)
+    .then((result) => {
+      res.status(201).json(result);
+    })
+    .catch((err) => {
+      res.status(400).json(err);
     })
 })
 
