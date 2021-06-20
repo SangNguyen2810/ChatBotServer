@@ -71,11 +71,17 @@ router.post("/login", async (req, res) => {
   const {username, password} = req.body;
   UserController.loginPost(username, password)
     .then((user) => {
+      console.log("Sang dep trai user: ",user);
       const token = createToken(user._id);
       res.cookie('jwt', token, {httpOnly: true,maxAge: maxAge * 7});
       res.status(201).json({
         message: apiMessage.LOGIN_SUCCEED,
-        user: username,
+        user: {
+          username: user.username,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName
+        },
         token: token
       });
     })
