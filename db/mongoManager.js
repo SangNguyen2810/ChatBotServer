@@ -1,4 +1,8 @@
 import mongoose from "mongoose";
+import dbConfig from  "./../configs/dbConfig";
+
+const url = dbConfig.dbUrl;
+
 class MongoManager {
   constructor() {
     this.connectDb();
@@ -6,7 +10,7 @@ class MongoManager {
 
   connectDb() {
     const connectMongo = async () => {
-      await mongoose.connect("mongodb://localhost:27017/ChatBot", {
+      await mongoose.connect(url, {
         useNewUrlParser: true,
         useFindAndModify: false,
         useCreateIndex: true,

@@ -6,7 +6,6 @@ import jwt from "jsonwebtoken";
 import config from "../config";
 import apiMessage from "../static/apiMessage";
 import mongoose from 'mongoose';
-import MsgModel from "../db/model/msgModel";
 import cookieParser from 'cookie-parser';
 
 const maxAge = 1 * 24 * 60 * 60; // maxAge of 1 day
@@ -71,7 +70,6 @@ router.post("/login", async (req, res) => {
   const {username, password} = req.body;
   UserController.loginPost(username, password)
     .then((user) => {
-      console.log("Sang dep trai user: ",user);
       const token = createToken(user._id);
       res.cookie('jwt', token, {httpOnly: true,maxAge: maxAge * 7});
       res.status(201).json({
@@ -117,25 +115,6 @@ router.get("/profile", async (req,res) => {
   .catch((err) => {
     res.send(apiMessage.NOT_FOUND_USER);
   });
-})
-
-//chat in channel
-router.post("/chat/:channelId", async (req,res) => {
-  const {message} = req.body;
-  const c_id = mongoose.Types.ObjectId(req.params.channelId);
-  MsgController.createMsg(c_id, req.userId, message) //userId get from authMiddleware
-    .then((result) => {
-      res.status(201).json({
-        message: apiMessage.CHAT_SUCCEED,
-        channelId: req.params.channelId,
-        username: result.username,
-        chatMessage: message,
-        createdAt: result.createdAt
-      });
-    })
-    .catch((err) => {
-      res.status(400).send(err);
-    })
 })
 
 //adding Friend
@@ -200,5 +179,6 @@ router.get("/logout", async (req,res) => {
   res.json(apiMessage.LOGOUT_DONE);
   //res.redirect('/');
 })
+
 
 export default router;
