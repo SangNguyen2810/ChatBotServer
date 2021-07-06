@@ -5,7 +5,6 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --exec babel-node app.js",
-   
     "start": "nodemon --exec babel-node app.js"
   },
   "repository": {
@@ -25,7 +24,7 @@
     "@babel/node": "^7.14.2",
     "@babel/preset-env": "^7.14.4",
     "babel-plugin-module-resolver": "^4.1.0",
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.9"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
