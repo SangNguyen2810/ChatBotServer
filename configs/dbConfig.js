@@ -15,4 +15,4 @@ var DBconfigs = {
 
 };
 
-module.exports = DBconfigs.clouddb;
+export default DBconfigs.clouddb;
