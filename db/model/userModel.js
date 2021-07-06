@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose;
 import bcrypt from "bcrypt";
-import dbMessage from '../../static/dbMessage';
+import dbMessage from '../../static/dbMessage.js';
 import { isEmail } from 'validator';
 const saltRounds = 10;
 

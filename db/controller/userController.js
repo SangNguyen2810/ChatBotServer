@@ -1,10 +1,10 @@
-import UserModel from "../model/userModel";
-import ChannelModel from "../model/channelModel";
-import MsgModel from "../model/msgModel";
-import MsgController from "../controller/msgController";
-import DbMessage from "../../static/dbMessage";
-import apiMessage from "../../static/apiMessage";
-import connect from '../mongoManager';
+import UserModel from "../model/userModel.js";
+import ChannelModel from "../model/channelModel.js";
+import MsgModel from "../model/msgModel.js";
+import MsgController from "../controller/msgController.js";
+import DbMessage from "../../static/dbMessage.js";
+import apiMessage from "../../static/apiMessage.js";
+import connect from '../mongoManager.js';
 import bcrypt from 'bcrypt';
 
 class UserController {

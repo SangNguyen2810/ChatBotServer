@@ -1,7 +1,7 @@
 import express from "express";
-import UserMessage from "../static/userMessage";
-import MsgController from "../db/controller/msgController";
-import apiMessage from "../static/apiMessage";
+import UserMessage from "../static/userMessage.js";
+import MsgController from "../db/controller/msgController.js";
+import apiMessage from "../static/apiMessage.js";
 import mongoose from 'mongoose';
 
 const router = express.Router();

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import dbConfig from  "./../configs/dbConfig";
+import dbConfig from  "./../configs/dbConfig.js";
 
 const url = dbConfig.dbUrl;
 

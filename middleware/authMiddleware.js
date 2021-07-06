@@ -1,9 +1,9 @@
 import jwt from "jsonwebtoken";
-import connect from "../db/mongoManager";
-import config from "../config";
-import UserModel from "../db/model/userModel";
-import DbMessage from "../static/dbMessage";
-import apiMessage from "../static/apiMessage";
+import connect from "../db/mongoManager.js";
+import config from "../config.js";
+import UserModel from "../db/model/userModel.js";
+import DbMessage from "../static/dbMessage.js";
+import apiMessage from "../static/apiMessage.js";
 
 const maxAge = 1 * 60 * 60;
 const authenticateJWT = (req,res,next) => {

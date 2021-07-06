@@ -1,10 +1,10 @@
 import express from "express";
-import UserMessage from "../static/userMessage";
-import UserController from "../db/controller/userController";
-import MsgController from "../db/controller/msgController";
+import UserMessage from "../static/userMessage.js";
+import UserController from "../db/controller/userController.js";
+import MsgController from "../db/controller/msgController.js";
 import jwt from "jsonwebtoken";
-import config from "../config";
-import apiMessage from "../static/apiMessage";
+import config from "../config.js";
+import apiMessage from "../static/apiMessage.js";
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 
