@@ -2,7 +2,8 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 import bcrypt from "bcrypt";
 import dbMessage from '../../static/dbMessage.js';
-const { isEmail } = require('validator').isEmail;
+import validator from "validator";
+const { isEmail } = validator;
 const saltRounds = 10;
 
 const UserSchema = new Schema({
