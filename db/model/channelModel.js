@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose;
-import dbMessage from '../../static/dbMessage';
+import dbMessage from '../../static/dbMessage.js';
 
 const ChannelSchema = new Schema(
   { 
