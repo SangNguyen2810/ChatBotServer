@@ -1,5 +1,5 @@
 import express from "express";
-import MongoManager from "./db/mongoManager";
+import MongoManager from "./db/mongoManager.js";
 
 import userRouter from "./routes/users.js";
 import chatRouter from "./routes/chat.js";
