@@ -145,6 +145,13 @@ router.post("/createChannel", async (req,res) => {
     })
 })
 
+router.post("/testApi", async (req,res) => {
+  res.status(201).json({
+    message: 'Sang dep trai'
+  })
+})
+
+
 //join channel
 router.post("/joinChannel", async (req,res) => {
   const {channelId} = req.body;
