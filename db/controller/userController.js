@@ -272,20 +272,17 @@ class UserController {
       await UserModel.findById(userId).populate({
         path: 'listChannel', 
         select: ['channelName', '_id', 'listUser'],
-        perDocumentLimit: 10,
+        perDocumentLimit: 100,
         options: {
           sort: {updatedAt: -1},
-        },
-        populate: {
-          path: 'listUser',
-          select: ['_id', 'username'],
         }
       }).exec(async function (err, user){
         if (err) {
           return reject(err);
         }
         else {
-          var channels = user.listChannel;
+          console.log("Sang dep trai user: ",user);
+          let channels = user.listChannel;
           async function res(channels) {
             async function getMsgChannel(channel) {
               return new Promise (async (resolve) => {
@@ -294,33 +291,45 @@ class UserController {
                     .sort({createdAt: -1})
                     .limit(1)
                     .exec(); 
-                  if (msg[0].msgType == 0) {
-                    const channelRes = {
-                      channel: channel,
-                      lastConversation: {
-                        content: msg[0].messageText,
-                        channelId: msg[0].channelId,
-                        messageId: msg[0].messageId,
-                        msgType: msg[0].msgType,
-                        sendTime: msg[0].created_at,
+
+                  const lastMessage = msg[0];
+                  if(lastMessage){
+                    if (lastMessage.msgType == 0) {
+                      const channelRes = {
+                        channel: channel,
+                        lastConversation: {
+                          content: lastMessage.messageText,
+                          channelId: lastMessage.channelId,
+                          messageId: lastMessage.messageId,
+                          msgType: lastMessage.msgType,
+                          sendTime: lastMessage.created_at,
+                        }
+                      };
+                      return resolve(channelRes);
+                    }
+                    else if (lastMessage.msgType == 1) {
+                      const text = await MsgController.getFullTextMsg(msg[0]);
+                      const channelRes = {
+                        channel: channel,
+                        lastConversation: text
                       }
-                    };
-                    return resolve(channelRes);
-                  }
-                  else if (msg[0].msgType == 1) {
-                    const text = await MsgController.getFullTextMsg(msg[0]);
+                      return resolve(channelRes);
+                    }  
+                  }else{
                     const channelRes = {
                       channel: channel,
-                      lastConversation: text
+                      lastConversation: null
                     }
                     return resolve(channelRes);
-                  }  
+                  }
+                  
                 }
                 catch (e) {
                   const error = {
                     channel: channel,
                     error: e,
                   }
+
                   return resolve(error);
                 }
               })

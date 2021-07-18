@@ -1,4 +1,4 @@
-var DBconfigs = {
+let DBconfigs = {
     clouddb: {
         dbName : "ChatBot",
         dbUsername : "dbAdmin",

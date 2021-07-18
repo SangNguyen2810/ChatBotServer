@@ -56,7 +56,7 @@ class MsgController {
           else {
             const messageId = channel.numMessage;
             const chunkMsg = this.chunkMsg(message);
-            var msgType = 0; //normal message
+            let msgType = 0; //normal message
             if (chunkMsg.length >1 )
             {
               msgType = 1; //multi message
@@ -130,7 +130,7 @@ class MsgController {
             return reject (err);
           }
           else {
-            var messageText = '';
+            let messageText = '';
             messages.forEach((message) => {
               messageText = messageText + message.messageText;
             })

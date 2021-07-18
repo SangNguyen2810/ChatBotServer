@@ -10,7 +10,7 @@ class MongoManager {
 
   connectDb() {
     const connectMongo = async () => {
-      await mongoose.connect(url, {
+      await mongoose.connect("mongodb://localhost:27017/ChatBot", {
         useNewUrlParser: true,
         useFindAndModify: false,
         useCreateIndex: true,

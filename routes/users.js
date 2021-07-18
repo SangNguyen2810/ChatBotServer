@@ -8,7 +8,7 @@ import apiMessage from "../static/apiMessage.js";
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 
-const maxAge = 1 * 24 * 60 * 60; // maxAge of 1 day
+const maxAge = 1 * 24 * 60 * 60 * 1000; // maxAge of 1 day
 const createToken = (id) => {
   return jwt.sign({id}, config.secret, {
     expiresIn: maxAge
@@ -71,7 +71,7 @@ router.post("/login", async (req, res) => {
   UserController.loginPost(username, password)
     .then((user) => {
       const token = createToken(user._id);
-      res.cookie('jwt', token, {httpOnly: true,maxAge: maxAge * 7});
+      res.cookie('jwt', token, {httpOnly: true,maxAge: maxAge * 7,sameSite:'strict'});
       res.status(201).json({
         message: apiMessage.LOGIN_SUCCEED,
         user: {
@@ -131,8 +131,8 @@ router.post("/addFriend", async (req,res) => {
 
 //creating channel
 router.post("/createChannel", async (req,res) => {
-  const {channel_name} = req.body;
-  UserController.createChannel(req.userId, channel_name) //userId get from authMiddleware
+  const {channelName} = req.body;
+  UserController.createChannel(req.userId, channelName) //userId get from authMiddleware
     .then((channel) => {
       res.status(201).json({
         message: apiMessage.CREATING_CHANNEL_SUCCEED,
