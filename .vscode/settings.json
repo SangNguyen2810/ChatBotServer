@@ -1,3 +1,8 @@
 {
-    "git.ignoreLimitWarning": true
+    "git.ignoreLimitWarning": true,
+    "editor.codeLensFontFamily": "JetBrains Mono SemiBold",
+    "editor.inlayHints.fontFamily": "JetBrains Mono SemiBold, 'Courier New', monospace",
+    "scm.inputFontFamily": "JetBrains Mono SemiBold",
+    "markdown.preview.fontFamily": "JetBrains Mono SemiBold, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif",
+    "editor.fontFamily": "JetBrains Mono SemiBold, 'Courier New', monospace"
 }

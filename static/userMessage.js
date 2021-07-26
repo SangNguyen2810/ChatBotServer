@@ -7,6 +7,7 @@ const dbMessage = {
   FIRST_NAME_CAN_NOT_EMPTY: 306,
   LAST_NAME_CAN_NOT_EMPTY: 307,
   DATE_OF_BIRTH_CAN_NOT_EMPTY: 308,
+  USERNAME_IS_TAKEN: 309,
 };
 
 export default dbMessage;

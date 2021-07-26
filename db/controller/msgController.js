@@ -1,9 +1,8 @@
-import MsgModel from "../model/msgModel.js";
-import ChannelModel from "../model/channelModel.js";
-import UserModel from "../model/userModel.js";
+import MsgModel from "../../graphql/model/msgModel.js";
+import ChannelModel from "../../graphql/model/channelModel.js";
+import UserModel from "../../graphql/model/userModel.js";
 import DbMessage from "../../static/dbMessage.js";
 import apiMessage from "../../static/apiMessage.js";
-import connect from '../mongoManager.js';
 const MAX_MONGODB_CHAR_LENGTH = 10;
 
 class MsgController {

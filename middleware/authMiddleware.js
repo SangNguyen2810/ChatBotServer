@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken";
-import connect from "../db/mongoManager.js";
-import config from "../config.js";
-import UserModel from "../db/model/userModel.js";
+import config from "../config";
+import UserModel from "../graphql/model/userModel";
 import DbMessage from "../static/dbMessage.js";
 import apiMessage from "../static/apiMessage.js";
 

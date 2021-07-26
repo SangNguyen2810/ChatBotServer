@@ -12,16 +12,19 @@ const ChannelSchema = new Schema(
       type: Number,
       default: 0
     },
+    createdAt: {
+      type: String,
+      require: true
+    },
+    admin: {
+      type: Schema.Types.ObjectId,
+      ref: "User"
+    },
     listUser: [{
       type: Schema.Types.ObjectId,
       ref: "User",
-    }]
+    }],
   },
-  {
-    timestamps: {
-      createdAt: 'created_at',
-    }
-  }
 );
 
 const ChannelModel = mongoose.model("Channel", ChannelSchema, "Channel");
