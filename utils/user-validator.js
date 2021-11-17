@@ -1,42 +1,48 @@
 import UserMessage from "../static/userMessage.js";
 
+class UserValidator {
+  constructor() {}
 
-class UserValidator{
-  constructor(){
-
-  }
-
-  validateRegisterInput(username, password, email, firstName, lastName, dateOfBirth){
-    const errors = [];
+  validateRegisterInput(
+    username,
+    password,
+    email,
+    firstName,
+    lastName,
+    dateOfBirth
+  ) {
+    let error = {};
     if (!firstName) {
-      errors.push({err: UserMessage.FIRST_NAME_CAN_NOT_EMPTY})
+      error = UserMessage.FIRST_NAME_CAN_NOT_EMPTY;
+      return error;
     }
     if (!lastName) {
-      errors.push({err: UserMessage.LAST_NAME_CAN_NOT_EMPTY})
+      error = UserMessage.LAST_NAME_CAN_NOT_EMPTY;
+      return error;
     }
     if (!username) {
-      errors.push({err: UserMessage.USERNAME_CAN_NOT_EMPTY})
+      error = UserMessage.USERNAME_CAN_NOT_EMPTY;
+      return error;
     }
     if (!password) {
-      errors.push({err: UserMessage.PASSWORD_CAN_NOT_EMPTY})
+      error = UserMessage.PASSWORD_CAN_NOT_EMPTY;
+      return error;
     }
     if (!email) {
-      errors.push({err: UserMessage.EMAIL_CAN_NOT_EMPTY})
+      error = UserMessage.EMAIL_CAN_NOT_EMPTY;
+      return error;
     }
     if (!dateOfBirth) {
-      errors.push({err: UserMessage.DATE_OF_BIRTH_CAN_NOT_EMPTY})
+      error = UserMessage.DATE_OF_BIRTH_CAN_NOT_EMPTY;
+      return error;
     }
-  
-    console.log(JSON.stringify(errors));
     if (password.length < 6) {
-      errors.push({err: UserMessage.PASSWORD_NOT_ENOUGH_LENGTH});
+      error = UserMessage.PASSWORD_NOT_ENOUGH_LENGTH;
+      return error;
     }
-    return errors;
+    return error;
   }
-
-
 }
-
 
 const userValidator = new UserValidator();
 export default userValidator;

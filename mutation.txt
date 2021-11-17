@@ -1,0 +1,14 @@
+mutation{
+  register(registerInput:{
+    username:"sang123122"
+    password:"123123123"
+    email:"sang@gmail.com"
+    firstName:"Sang"
+    lastName:"Nguyen"
+    dateOfBirth:"123123"
+    confirmPassword:"123123123"
+  }){
+    id
+    username
+  }
+}
